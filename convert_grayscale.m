@@ -1,4 +1,4 @@
-
+%mengubah gambar RGB menjadi gambar grayscale
 function img_grayscale = convert_grayscale(img_rgb)
 %mendeteksi jumlah channel warna
 [~, ~, number_of_channel] = size(img_rgb);
@@ -19,8 +19,6 @@ function img_grayscale = convert_grayscale(img_rgb)
     %jika gambar hanya mempunyai 1 channel warna/sudah grayscale    
     else
         %gambar langsung disimpan dalam variabel img_grayscale
-        img_grayscale = rgb;  
+        img_grayscale = img_rgb;  
     end
 end
-
-
