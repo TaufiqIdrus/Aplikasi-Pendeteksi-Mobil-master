@@ -1,6 +1,11 @@
 %function konvolusi untuk melakukan operasi konvolusi gambar input A dengan
 %kernel k untuk menghasilkan gambar output B
-function B = konvolusi(A, k);
+function B = konvolusi(A);
+k = [-1 0  0 0 -1;
+          -1 0 0 0 -1;
+          -1 0 9 0 -1;
+          -1 0 0 0 -1;
+          -1 0 0 0 -1];
 %mendapatkan ukuran gambar input A
 [r c] = size(A);
 %mendapatkan ukuran kernel k

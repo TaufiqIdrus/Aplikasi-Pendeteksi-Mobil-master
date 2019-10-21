@@ -22,7 +22,7 @@ function varargout = main_menu(varargin)
 
 % Edit the above text to modify the response to help main_menu
 
-% Last Modified by GUIDE v2.5 21-Sep-2019 05:29:28
+% Last Modified by GUIDE v2.5 20-Oct-2019 15:32:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -108,13 +108,86 @@ if ~isequal(file_name,0)
     mobil_grayscale = convert_grayscale(mobil_rgb);
     %menampilkan image ke dalam axes dengan label img_grayscale
     axes(handles.img_grayscale);
-    imshow(mobil_grayscale);
     
+    imshow(mobil_grayscale);
     %mendeteksi edge dengan metode canny
-    mobil_edge = edge(mobil_grayscale,'canny');
+    mobil_edge =konvolusi(mobil_grayscale);
     %menampilkan image ke dalam axes dengan label img_grayscale
     axes(handles.img_edge);
     imshow(mobil_edge);
+    splitImage = split(mobil_edge);
+    
+    if exist('sampleT.mat', 'file') && exist('sampleF.mat', 'file')
+        load('sampleT.mat');
+        load('sampleF.mat');
+    else
+        set(handles.txt_kesimpulan, 'String', 'Lakukan training dahulu!');
+    end
+    
+    %checkif train data valid
+    if exist('fTotalF','var') && exist('fTotalT','var')
+      
+        
+       mseXeniaTotal = zeros;
+       mseAvanzaTotal = zeros;
+       xenia = 0; %tiren
+       avanza = 0; %segar
+       %per- split image test
+       for i =1: 2
+           for j =1 : 2
+                curGray = splitImage{i, j}; 
+                dataVector=curGray(:);
+                [~,fr] = TDistribusiFrekuensi(dataVector,6);
+                mseXenia = MeanSquareE(fTotalF, fr);
+                mseAvanza = MeanSquareE(fTotalT, fr);
+                
+                %save result for table
+                if i==1 && j==1
+                    mseXeniaTotal = mseXenia;
+                    mseAvanzaTotal = mseAvanza;
+                else
+                    mseXeniaTotal = [mseXeniaTotal;mseXenia];
+                    mseAvanzaTotal = [mseAvanzaTotal;mseAvanza];
+                end
+                
+                %decide each image
+                if mseAvanza>mseXenia
+                   kesimpulan = 'Xenia';
+                   xenia = xenia +1;
+                else
+                    kesimpulan = 'Avanza';
+                    avanza = avanza+1;
+                end
+
+
+           end
+       end
+       
+       %end
+       
+       %estimating
+       %formatting data into table
+       format shortG;
+
+       if xenia>avanza
+           set(handles.txt_kesimpulan, 'String', 'Avanza');
+       elseif avanza>xenia
+           set(handles.txt_kesimpulan, 'String', 'Xenia');
+       else
+           %sama
+            if sum(mseAvanzaTotal)>sum(mseXeniaTotal)
+               set(handles.txt_kesimpulan, 'String', 'Avanza');
+            else
+               set(handles.txt_kesimpulan, 'String', 'Xenia');
+            end
+       end
+       
+    else
+        set(handles.txt_kesimpulan, 'String', 'Lakukan training dahulu!');
+    end
+    
+else
+    return;
 end
 
 
@@ -123,17 +196,38 @@ function btn_avanza_Callback(hObject, eventdata, handles)
 % hObject    handle to btn_avanza (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+folder_name = uigetdir('','Pilih Folder mobil avanza');
+if ~isequal(folder_name,0)
+    samplingT(folder_name);
+    f = msgbox('Training gambar mobil avanza selesai!');
+else
+    return;
+end
 
 
 % --- Executes on button press in btn_innova.
-function btn_innova_Callback(hObject, eventdata, handles)
+function btn_xenia_Callback(hObject, eventdata, handles)
 % hObject    handle to btn_innova (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+folder_name = uigetdir('','Pilih Folder Gambar mobil xenia');
+if ~isequal(folder_name,0)
+    samplingF(folder_name);
+    f = msgbox('Training gambar mobil xenia selesai!');
+else
+    return;
+end
 
 
 % --- Executes during object creation, after setting all properties.
 function figure1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes during object creation, after setting all properties.
+function text21_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to text21 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called

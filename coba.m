@@ -1,5 +1,5 @@
 %load image
-img_rgb=imread('avanza-1.jpg');
+%img_rgb=imread('avanza\ww.jpg');
 
 %convert ke grayscale
 img_grayscale = convert_grayscale(img_rgb);
@@ -32,9 +32,18 @@ kernel = [-1 0  0 0 -1;
 kernel3 = [-1 -1 -1;
           -1 8 -1;
           -1 -1 -1];
-      
-c= konvolusi(img_grayscale, kernel);
 
-d= edge(img_grayscale,'canny');
+kernel9 = 1/9 * [1 1 1;
+    1 1 1;
+    1 1 1];
 
-imshow([c,d]);
+sobel = [-1 0 1;
+    -2 0 2;
+    -3 0 3];
+%c= konvolusi(img_grayscale, kernel);
+
+%ee=konvolusi(rgb2gray(imread('xenia 1\xenia-6.jpg')), kernel9);
+ee = gaussian_blur(imread('avanza-1.jpg'));
+be=konvolusi(ee,kernel);
+
+imshow([be]);
